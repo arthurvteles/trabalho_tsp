@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+//Primeiro vamos implementar o algoritmo de kruskal para achar a arvore geradora mínima
+typedef struct{
+    int node_x; 
+    int node_y; 
+    int weight;
+} Elements;
+
+
+int main(){
+    
+    //Abrindo o arquivo e criando uma matriz local // 
+    int size_matrix,i,j,**matrix; 
+    FILE *file; 
+    file = fopen("tsp1_253.txt", "r"); 
+    
+    if (file == NULL){
+        printf("O arquivo nao pode ser aberto\n") ; 
+        return 0 ; 
+    }
+    
+    //lê do usuário o tamanho do arquivo para fazermos a leitura
+    printf("Digite o tamanho da matriz:"); 
+    scanf("%d", &size_matrix);
+    
+    //fazemos a alocacao de memória da matriz// 
+    matrix = (int **) malloc(size_matrix * sizeof(int *));
+    for (i=0 ; i<size_matrix; i++){
+        matrix[i] = (int *) malloc(size_matrix * sizeof(int)) ; 
+    }
+    
+    //fazemos a leitura do arquivo e passamos para a matriz// 
+    for(i=0; i<size_matrix; i++){
+        for(j=0; j<size_matrix; j++){
+            fscanf(file, "%d", &matrix[i][j]);
+        }
+    }
+
+    for(i=0; i<size_matrix; i++){
+        for(j=0; j<size_matrix; j++){
+            printf("  %d  ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+    fclose(file) ; 
+}
