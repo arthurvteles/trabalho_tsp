@@ -2,21 +2,101 @@
 #include <stdlib.h>
 #include <math.h>
 
-//Primeiro vamos implementar o algoritmo de kruskal para achar a arvore geradora mínima
-typedef struct{
-    int node_x; 
-    int node_y; 
+//Primeiro vamos implementar o algoritmo de kruskal para achar a arvore geradora mínima//
+typedef struct elements {
+    int value_x; 
+    int value_y; 
     int weight;
 } Elements;
 
+//no da lista encadeada para kruskal//
+typedef struct node{
+    Elements element; 
+    struct node *next ; 
+    struct node *prev; 
+}Node;
 
+//struct para lista encadeada/ para kruskal// 
+typedef struct list{
+    Node *head; 
+    int size; 
+}List; 
+
+//Nó para nossas arvores para kruskal//
+typedef struct treenode{
+    Elements elements; 
+    struct treenode *left ; 
+    struct treenode *right ; 
+}TreeNode; 
+
+
+
+//funções para kruskal//
+//funcao que inicializa a lista encadeada// 
+List* ini_list(List *list){
+    list->head = NULL ; 
+    return list;  
+}
+
+List * insert_node(List *list,int valuex , int valuey,int value){
+    Elements *elements = (Elements*) malloc(sizeof(Elements)) ;
+    elements->value_x = valuex ; 
+    elements->value_y = valuey ; 
+    elements->weight = value ; 
+
+    Node *new_node =  (Node*) malloc(sizeof(Node)) ; 
+    new_node->element = *elements ; 
+    new_node->next = NULL; 
+    new_node->prev = NULL ; 
+
+    //se a lista estiver vazia adicionamos no primeiro elemento//
+    if(list->head == NULL){
+        list->head =  new_node; 
+        return list; 
+    }else{
+        Node *run_list = list->head ; 
+        while(run_list->next != NULL){
+            if((run_list->element.value_x == valuey) &&((run_list->element.value_y == valuex))){
+                return list; 
+            }
+            
+            if(value < run_list->element.weight){
+                //se vamos adicionar o novo elemento na primeira posição da lista
+                if(run_list == list->head) {
+                    if(run_list)
+                    new_node->next = run_list ; 
+                    run_list->prev = new_node ; 
+                    list->head = new_node ; 
+                    return list ; 
+                }else{
+                //se vamos adicionar o novo elemento no meio
+                    run_list->prev->next = new_node; 
+                    new_node->next = run_list ;
+                    new_node->prev = run_list->prev ; 
+                    run_list->prev = new_node ;  
+                    return list ; 
+                }
+            }
+            run_list = run_list->next ;
+        }
+        //adicionamos o elemento na ultima posição 
+        run_list->next = new_node ; 
+        new_node->prev = run_list ;
+        return list;  
+    }
+
+}
+//Fim das funções para kruskal//
 int main(){
     
     //Abrindo o arquivo e criando uma matriz local // 
     int size_matrix,i,j,**matrix; 
     FILE *file; 
     file = fopen("tsp1_253.txt", "r"); 
-    
+    List *list = (List*) malloc(sizeof(List)); 
+    list = ini_list(list) ; 
+
+
     if (file == NULL){
         printf("O arquivo nao pode ser aberto\n") ; 
         return 0 ; 
@@ -32,18 +112,34 @@ int main(){
         matrix[i] = (int *) malloc(size_matrix * sizeof(int)) ; 
     }
     
-    //fazemos a leitura do arquivo e passamos para a matriz// 
+
+    //fazemos a leitura do arquivo e passamos para a matriz,além disso criamos a lista de valores para kruskal// 
     for(i=0; i<size_matrix; i++){
         for(j=0; j<size_matrix; j++){
             fscanf(file, "%d", &matrix[i][j]);
+            //fazer a leitura para a ordenacao para kruskal 
+            if(matrix[i][j] != 0){
+                list =insert_node(list,i,j,matrix[i][j]) ; 
+            }
         }
     }
 
+    /*Imrpime a lista encadeada para kruskal como teste 
+    Node *run_list = list->head ; 
+    while(run_list->next != NULL){
+        printf("[%d e %d]=%d", run_list->element.value_x, run_list->element.value_y, run_list->element.weight); 
+        run_list = run_list->next ; 
+    }
+    */
+    //Imprime a matriz para teste// 
+    /*
     for(i=0; i<size_matrix; i++){
         for(j=0; j<size_matrix; j++){
-            printf("  %d  ", matrix[i][j]);
+            printf("\t%d ", matrix[i][j]);
+
         }
         printf("\n");
     }
+    */
     fclose(file) ; 
 }
